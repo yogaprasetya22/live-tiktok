@@ -4,7 +4,6 @@ import Box from "./clases/Box.js";
 import Character from "./clases/Character.js";
 import { boxCollision } from "./clases/BoxCollasion.js";
 
-
 const form = document.querySelector("form");
 const newName = document.querySelector("#m");
 form.addEventListener("submit", (e) => {
