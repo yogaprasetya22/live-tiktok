@@ -1,0 +1,33 @@
+canvas {
+  position: fixed;
+  top     : 0;
+  left    : 0;
+}
+
+form {
+  position: fixed;
+  top     : 0;
+  left    : 0;
+  z-index : 100;
+}
+
+form input {
+  font-size: 1rem;
+  padding: 10px;
+}
+
+form button {
+  font-size: 1rem;
+  padding: 10px;
+}
+
+#view {
+  position: fixed;
+  top     : 0;
+  right   : 0;
+  z-index : 100;
+  font-size: 2rem;
+  padding: 10px;
+  background-color: tomato;
+  color: white;
+}
