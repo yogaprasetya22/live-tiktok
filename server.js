@@ -2,20 +2,9 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-// const express = require("express");
-// const { createServer } = require("http");
-// const { Server } = require("socket.io");
-// const {
-//     TikTokConnectionWrapper,
-//     getGlobalConnectionCount,
-// } = require("./connectionWrapper");
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-// import {
-//     TikTokConnectionWrapper,
-//     getGlobalConnectionCount,
-// } from "./connectionWrapper";
 import {
     TikTokConnectionWrapper,
     getGlobalConnectionCount,

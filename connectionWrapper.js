@@ -1,5 +1,3 @@
-// const { WebcastPushConnection } = require("tiktok-live-connector");
-// const { EventEmitter } = require("events");
 import { WebcastPushConnection } from "tiktok-live-connector";
 import { EventEmitter } from "events";
 
