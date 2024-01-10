@@ -4,18 +4,6 @@ import Box from "./clases/Box.js";
 import Character from "./clases/Character.js";
 import { boxCollision } from "./clases/BoxCollasion.js";
 
-const form = document.querySelector("form");
-const newName = document.querySelector("#m");
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const Uname = newName.value;
-    if (Uname == "" || Uname == null) {
-        alert("Please enter a name");
-        return;
-    }
-    socket.emit("setUniqueId", Uname);
-});
-
 // main
 class ClassDasar {
     constructor() {
@@ -23,7 +11,7 @@ class ClassDasar {
     }
 
     _Initialize() {
-        this._socket = socket;
+        this._socket = connection;
         this._dataUser = [];
         this._newChat = true;
         this._camera = undefined;
@@ -36,8 +24,6 @@ class ClassDasar {
         this._spwanRate = 200;
         this._character = undefined;
         this._ground = undefined;
-        // this._canva2d = document.createElement("canvas");
-        // this._TextCanva = this._canva2d.getContext("2d");
         this._cube = new Box({
             width: 1,
             height: 1,
@@ -134,10 +120,13 @@ class ClassDasar {
 
         this._camera.position.z = 15;
 
-        this._socket.on("newChat", (data) => {
+        connection.on("newChat", (data) => {
             this._dataUser = JSON.parse(data);
             this._newChat = true;
         });
+        // connection.on("newChat", (msg) => {
+        //     console.log(msg);
+        // });
 
         // this._addText("Hello World", 250 * 2, "white", 0, 0, 0);
 
@@ -259,15 +248,15 @@ class ClassDasar {
                     this._newChat = false; // Set flag kembali ke false setelah diproses
                 }
             }
-            if (this._frames++ % this._spwanRate === 0) {
-                if (this._spwanRate > 50) this._spwanRate -= 50;
-                this._socket.on("updateViewCount", (data) => {
-                    this._dataUser = JSON.parse(data);
-                    document.getElementById(
-                        "view"
-                    ).innerHTML = `Viewers: ${this._dataUser.value}`;
-                });
-            }
+            // if (this._frames++ % this._spwanRate === 0) {
+            //     if (this._spwanRate > 50) this._spwanRate -= 50;
+            //     this._socket.on("updateViewCount", (data) => {
+            //         this._dataUser = JSON.parse(data);
+            //         document.getElementById(
+            //             "view"
+            //         ).innerHTML = `Viewers: ${this._dataUser.value}`;
+            //     });
+            // }
 
             // if (this._frames++ % this._spwanRate === 0) {
             //     if (this._spwanRate > 50) this._spwanRate -= 50;

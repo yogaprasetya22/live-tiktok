@@ -1,14 +1,13 @@
-// require("dotenv").config();
-import dotenv from "dotenv";
-dotenv.config();
+require("dotenv").config();
 
-import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import {
+const express = require("express");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const {
     TikTokConnectionWrapper,
     getGlobalConnectionCount,
-} from "./connectionWrapper.js";
+} = require("./connectionWrapper");
+const { clientBlocked } = require("./limiter");
 
 const app = express();
 const httpServer = createServer(app);
@@ -19,23 +18,38 @@ const io = new Server(httpServer, {
         origin: "*",
     },
 });
-const port = process.env.PORT || 3020;
-
-app.use(express.static("public"));
 
 io.on("connection", (socket) => {
     let tiktokConnectionWrapper;
 
+    console.info(
+        "New connection from origin",
+        socket.handshake.headers["origin"] ||
+            socket.handshake.headers["referer"]
+    );
+
     socket.on("setUniqueId", (uniqueId, options) => {
         // Prohibit the client from specifying these options (for security reasons)
-        if (typeof options === "object") {
+        if (typeof options === "object" && options) {
             delete options.requestOptions;
             delete options.websocketOptions;
+        } else {
+            options = {};
         }
 
-        // Is the client already connected to a stream? => Disconnect
-        if (tiktokConnectionWrapper) {
-            tiktokConnectionWrapper.disconnect();
+        // Session ID in .env file is optional
+        if (process.env.SESSIONID) {
+            options.sessionId = process.env.SESSIONID;
+            console.info("Using SessionId");
+        }
+
+        // Check if rate limit exceeded
+        if (process.env.ENABLE_RATE_LIMIT && clientBlocked(io, socket)) {
+            socket.emit(
+                "tiktokDisconnected",
+                "You have opened too many connections or made too many connection requests. Please reduce the number of connections/requests or host your own server instance. The connections are limited to avoid that the server IP gets blocked by TokTok."
+            );
+            return;
         }
 
         // Connect to the given username (uniqueId)
@@ -47,7 +61,7 @@ io.on("connection", (socket) => {
             );
             tiktokConnectionWrapper.connect();
         } catch (err) {
-            socket.emit("disconnected", err.toString());
+            socket.emit("tiktokDisconnected", err.toString());
             return;
         }
 
@@ -65,23 +79,13 @@ io.on("connection", (socket) => {
         );
 
         // Redirect message events
-        tiktokConnectionWrapper.connection.on(
-            "roomUser",
-            (msg) => {
-                let cbValue = {
-                    type: "updateViewCount",
-                    value: msg.viewerCount,
-                };
-
-                socket.emit("updateViewCount", JSON.stringify(cbValue));
-            }
-            // socket.emit("roomUser", msg)
-        );
+        tiktokConnectionWrapper.connection.on("roomUser", (msg) => {
+            socket.emit("roomUser", msg);
+        });
         tiktokConnectionWrapper.connection.on("member", (msg) =>
             socket.emit("member", msg)
         );
         tiktokConnectionWrapper.connection.on("chat", (msg) => {
-            console.log(`${msg.uniqueId}: ${msg.comment}`);
             let cbValue = {
                 type: "incomingChat",
                 value: msg.comment,
@@ -92,7 +96,6 @@ io.on("connection", (socket) => {
 
             socket.emit("newChat", JSON.stringify(cbValue));
         });
-
         tiktokConnectionWrapper.connection.on("gift", (msg) =>
             socket.emit("gift", msg)
         );
@@ -114,6 +117,15 @@ io.on("connection", (socket) => {
         tiktokConnectionWrapper.connection.on("liveIntro", (msg) =>
             socket.emit("liveIntro", msg)
         );
+        tiktokConnectionWrapper.connection.on("emote", (msg) =>
+            socket.emit("emote", msg)
+        );
+        tiktokConnectionWrapper.connection.on("envelope", (msg) =>
+            socket.emit("envelope", msg)
+        );
+        tiktokConnectionWrapper.connection.on("subscribe", (msg) =>
+            socket.emit("subscribe", msg)
+        );
     });
 
     socket.on("disconnect", () => {
@@ -128,5 +140,10 @@ setInterval(() => {
     io.emit("statistic", { globalConnectionCount: getGlobalConnectionCount() });
 }, 5000);
 
+// Serve frontend files
+app.use(express.static("public"));
+
+// Start http listener
+const port = process.env.PORT || 8081;
 httpServer.listen(port);
 console.info(`Server running! Please visit http://localhost:${port}`);
