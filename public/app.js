@@ -3,7 +3,7 @@
 let backendUrl =
     location.protocol === "file:"
         ? "https://live-tiktok-jagres.vercel.app/"
-        : undefined;
+        : "https://live-tiktok-jagres.vercel.app/socket.io";
 let connection = new TikTokIOConnection(backendUrl);
 
 // Counter
@@ -95,7 +95,7 @@ function isPendingStreak(data) {
 //         <div class=${summarize ? "temporary" : "static"}>
 //             <img class="miniprofilepicture" src="${data.profilePictureUrl}">
 //             <span>
-//                 <b>${generateUsernameLink(data)}:</b> 
+//                 <b>${generateUsernameLink(data)}:</b>
 //                 <span style="color:${color}">${sanitize(text)}</span>
 //             </span>
 //         </div>
