@@ -3,7 +3,7 @@
 let backendUrl =
     location.protocol === "file:"
         ? "https://live-tiktok-jagres.vercel.app/"
-        : "https://live-tiktok-jagres.vercel.app/socket.io";
+        : undefined;
 let connection = new TikTokIOConnection(backendUrl);
 
 // Counter

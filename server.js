@@ -15,7 +15,7 @@ const httpServer = createServer(app);
 // Enable cross origin resource sharing
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://live-tiktok-jagres.vercel.app",
+        origin: "*",
     },
 });
 

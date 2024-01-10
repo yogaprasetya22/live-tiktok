@@ -33,7 +33,7 @@ class Box extends THREE.Mesh {
         this._TextCanva = this._canva2d.getContext("2d");
 
         if (type === "enemy") {
-            this._addText(text, 200 * 2, color, 0, 1, 0);
+            this._addText(text, 200 * 2, color, 0, 1.4, 0);
             this._addImage(
                img,
                 2,
