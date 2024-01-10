@@ -2,7 +2,7 @@
 
 let backendUrl =
     location.protocol === "file:"
-        ? "https://tiktok-chat-reader.zerody.one/"
+        ? "https://live-tiktok-jagres.vercel.app/"
         : undefined;
 let connection = new TikTokIOConnection(backendUrl);
 
